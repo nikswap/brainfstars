@@ -1,79 +1,87 @@
-bfprogram = '++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.'
+program = '++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.'
 
+mem = [0]
 ip = 0
 dp = 0
-mem=[0]*100
+ci = program[ip]
 
-def incip():
+max_ip = 10000000
+
+def grow_mem(dp):
+    while len(mem) <= dp:        
+        mem.append(0)
+
+def inc_ip():
     global ip
     ip += 1
 
-def incdp():
+def inc_dp():
     global dp
     dp += 1
-    incip()
+    grow_mem(dp)
+    inc_ip()
 
-def decdp():
+def dec_dp():
     global dp
     dp -= 1
-    incip()
+    inc_ip()
 
-def incmem():
+def inc_mem():
     mem[dp] += 1
-    incip()
+    inc_ip()
 
-def decmem():
+def dec_mem():
     mem[dp] -= 1
-    incip()
+    inc_ip()
 
-def printmem():
+def print_mem():
     print(chr(mem[dp]),end='')
-    incip()
+    inc_ip()
 
-def readtomem():
-    a = input()[0]
-    mem[dp] = ord(a)
-    incip()
+def input_mem():
+    data = input()
+    mem[dp] = data[0]
+    inc_ip()
 
-def loopbegin():
+def forward_jmp():
     global ip
-    ip += 1
     if mem[dp] == 0:
-        ip += 1
-        k = 1
-        for i in range(ip,len(bfprogram)):
+        k = 0
+        for j in range(ip+1,len(program)):
+            i = program[j]
+            if i == '[':
+                k+=1
+            elif i == ']':
+                k-=1
             if k == 0:
+                ip = j+1
                 break
-            if bfprogram[i] == '[':
-                k += 1
-            elif bfprogram[i] == ']':
-                k -= 1
-        ip = i
+    else:
+        inc_ip()
 
-def loopend():
+def backwards_jmp():
     global ip
     if not mem[dp] == 0:
-        k = 1
-        for i in range(len(bfprogram)-1,ip,-1):
+        k = 0
+        for j in range(ip,0,-1):
+            i = program[j]
+            if i == ']':
+                k+=1
+            elif i == '[':
+                k-=1
             if k == 0:
+                ip = j+1
                 break
-            if bfprogram[i] == '[':
-                k -= 1
-            elif bfprogram[i] == ']':
-                k += 1
-        ip = i+1
     else:
-        ip += 1
+        inc_ip()
 
-chars = '><+-.,[]'
-funcs = [incdp,decdp,incmem,decmem,printmem,readtomem,loopbegin,loopend]
 
-counter = 30000
+instrc = '><+-.,[]'
+funcs = [inc_dp,dec_dp,inc_mem,dec_mem,print_mem,input_mem,forward_jmp,backwards_jmp]
 
-while counter > 0 and ip < len(bfprogram):
-    counter -= 1
-
-    c = bfprogram[ip]
-    print(funcs[chars.find(c)],mem)
-    funcs[chars.find(c)]()
-
+while max_ip > 0 and ip < len(program):
+    u = program[ip]
+    p = instrc.find(u)
+    funcs[p]()
+    max_ip -= 1
+print(ip, max_ip)
