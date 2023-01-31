@@ -24,16 +24,16 @@
 
 (defun find-matching-parans-rev (c)
 	(block outer
-		(let ((par 0) (revp (reverse *BFprogram*)))
-			(loop for idex from (- (length *BFprogram*) c) to (- (length *BFprogram*) 1)
+		(let ((par 0))
+			(loop for idex from c downto 0
 				do
-					(case (char revp idex)
+					(case (char *BFprogram* idex)
 						(#\[ (setf par (1- par)))
 						(#\] (setf par (1+ par)))
 						(t ())
 					)
 					(if (= par 0) 
-							(return-from outer (- (length *BFprogram*) idex))
+							(return-from outer idex)
 					)
 			)
 		)
@@ -44,45 +44,45 @@
 (defun handle-char (c)
 	(case c
 		(#\> 
-			(format t "inc dp~%")
+			;;(format t "inc dp~%")
 			(setf *dp* (1+ *dp*))
 			(setf *pc* (1+ *pc*))
 		)
 		(#\< 
-			(format t "dec dp~%")
+			;;(format t "dec dp~%")
 			(setf *dp* (1- *dp*))
 			(setf *pc* (1+ *pc*))
 		)
 		(#\- 
-			(format t "dec dp val~%")
+			;;(format t "dec dp val~%")
 			(setf (aref *mem* *dp*) (1- (aref *mem* *dp*)))
 			(setf *pc* (1+ *pc*))
 		)
 		(#\, 
-			(format t "input~%")
+			;;(format t "input~%")
 			(setf *pc* (1+ *pc*))
 		)
 		(#\. 
-			(format t "output~%")
-			(format t "~A~%" (code-char (aref *mem* *dp*)))
+			;;(format t "output~%")
+			(format t "~A" (code-char (aref *mem* *dp*)))
 			(setf *pc* (1+ *pc*))
 		)
 		(#\[ 
-			(format t "loop begin~%")
+			;;(format t "loop begin~%")
 			(if (= 0 (aref *mem* *dp*))
 				(setf *pc* (1+ (find-matching-parans *pc*)))
 				(setf *pc* (1+ *pc*))
 			)
 		)
 		(#\] 
-			(format t "loop end~%")
+			;;(format t "loop end~%")
 			(if (= 0 (aref *mem* *dp*))
 				(setf *pc* (1+ *pc*))
 				(setf *pc* (1+ (find-matching-parans-rev *pc*)))
 			)
 		)
 		(#\+ 
-			(format t "inc dp val~%")
+			;;(format t "inc dp val~%")
 			(setf (aref *mem* *dp*) (1+ (aref *mem* *dp*)))
 			(setf *pc* (1+ *pc*))
 		)
@@ -91,7 +91,7 @@
 			(sb-ext:exit)
 		)
 	)
-	(format t "PC, DP: ~a~%" (list *pc* *dp*))
+	;;(format t "PC, DP: ~a~%" (list *pc* *dp*))
 )
 
 ;;(format t "~A~%" (char *BFprogram* *pc*))
@@ -103,7 +103,7 @@
 		(sb-ext:exit)
 	)
 	(handle-char (char *BFprogram* *pc*))
-	(format t "~a~%" *mem*)
+	;;(format t "~a~%" *mem*)
 )
 ;; Character 	Meaning
 ;; > 	increment the data pointer (to point to the next cell to the right).
